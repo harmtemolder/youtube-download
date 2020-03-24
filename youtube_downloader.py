@@ -76,35 +76,22 @@ def file_exists_in_directory(file, directory):
 
 
 def download_video(url, output_path):
-    """Downloads a YouTube video from url to output_path using pytube,
-    naming it according to output_name.
+    """Downloads the lowest resolution of a YouTube video containing both
+    audio and video from `url` to `output_path` using PyTube
     """
 
-    mime_type = 'video/mp4'
-    video_codec = 'avc1.42001E'
-    audio_codec ='mp4a.40.2'
-
     youtube_video = YouTube(url)
-    mpeg_streams = youtube_video.streams.filter(
-        mime_type=mime_type,
-        video_codec=video_codec,
-        audio_codec=audio_codec)
+    stream = youtube_video.streams.get_lowest_resolution()
 
-    if mpeg_streams.count() < 1:
-        raise IOError('No stream found with the asked mime_type ({}), '
-                      'video_codec ({}) and audio_codec ({}) found for '
-                      '{}'.format(
-            mime_type,
-            video_codec,
-            audio_codec,
-            youtube_video.title))
+    if stream is None:
+        raise IOError('No stream with video and audio found for {}'
+                      .format(youtube_video.title))
 
-    stream = mpeg_streams.first()
     stream.download(output_path)
 
 
-input_path = 'input/20181129_yogawithadrienne.html'
-output_path = '/Users/harmtemolder/stack/Videos/Yoga with Adrienne'
+input_path = 'input/20200324_yogawithadrienne.html'
+output_path = '/Users/harmtemolder/STACK/Videos/Yoga with Adrienne'
 
 all_videos = get_links_from_file(input_path)
 new_titles = get_new_titles(

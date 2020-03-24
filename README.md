@@ -12,4 +12,7 @@
 * Make sure that you have the latest version of PyTube. Update by running these commands in your terminal:
   1. `source activate downloadyoutube`, or whichever environment you use to run `youtube_downloader.py` from
   1. `pip install pytube3` ([docs](https://python-pytube.readthedocs.io/en/latest/user/install.html))
+* And the latest version of BeautifulSoup4:
+  1. `source activate downloadyoutube`, or whichever environment you use to run `youtube_downloader.py` from
+  1. `conda install beautifulsoup4`
 * Sometimes a video will be downloaded with the filename "YouTube.mp4". Not sure why. Feel free to delete this and run `youtube_downloader.py` again

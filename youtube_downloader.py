@@ -13,6 +13,7 @@ in "input_path", make sure that "output_path" is correct and press play.
 Example video page: https://www.youtube.com/user/yogawithadriene/videos
 """
 
+import io
 import os
 import subprocess
 
@@ -25,7 +26,7 @@ def get_links_from_file(html_file):
     """Scrape all video links and titles from the given HTML file.
     """
 
-    with open(input_path) as input_file:
+    with io.open(input_path, mode='r', encoding='utf-8') as input_file:
         soup = BeautifulSoup(input_file, 'html.parser')
 
     video_links = soup.find_all('a', id='video-title')

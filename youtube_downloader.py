@@ -76,19 +76,72 @@ def file_exists_in_directory(file, directory):
 
 
 def download_video(url, output_path):
-    """Downloads the lowest resolution of a YouTube video containing both
-    audio and video from `url` to `output_path` using PyTube
+    """Downloads the lowest resolution video stream and lowest bitrate
+    audio stream of a YouTube video from `url` using PyTube and combines
+    those into a single file under `output_path` using FFmpeg
     """
 
-    youtube_video = YouTube(url)
-    stream = youtube_video.streams.get_lowest_resolution()
+    video_filter = {
+        'only_video': True,
+        'subtype': 'mp4',
+        'res': '240p'  # You could manually select a higher resolution
+    }
 
-    if stream is None:
-        raise IOError('No stream with video and audio found for {}'
+    audio_filter = {
+        'only_audio': True,
+        'subtype': 'mp4',
+        # 'abr': '128kbps'  # Or a higher bitrate
+    }
+
+    youtube_video = YouTube(url)
+    video_stream = youtube_video.streams.filter(**video_filter)\
+        .order_by('resolution').first()
+    audio_stream = youtube_video.streams.filter(**audio_filter)\
+        .order_by('abr').first()
+
+    if (video_stream is None) or (audio_stream is None):
+        raise IOError('No stream matching your filters found for {}'
                       .format(youtube_video.title))
 
-    stream.download(output_path)
+    video_path = video_stream.download(
+        output_path,
+        filename_prefix='video_')
+    audio_path = audio_stream.download(
+        output_path,
+        filename_prefix='audio_')
 
+    combine_streams(
+        video_path,
+        audio_path,
+        '{}/{}'.format(output_path, video_stream.default_filename))
+
+    os.remove(video_path)
+    os.remove(audio_path)
+
+def combine_streams(video_path, audio_path, output_path):
+    """Combines an MP4 video and an MP4 audio file into one file with both video
+    and audio. Uses `ffmpeg` (see
+    https://github.com/nficano/pytube/issues/421#issuecomment-511987566)
+
+    :param video_path: The full path to the input video stream
+    :param audio_path: The full path to the input audio stream
+    :param output_path: The full path to the output_path file
+    :return: None
+    """
+
+    FNULL = open(os.devnull, 'w')
+    subprocess.run([
+        "./ffmpeg",
+        "-n",
+        "-i",
+        f"{video_path}",
+        "-i",
+        f"{audio_path}",
+        "-c",
+        "copy",
+        f"{output_path}"],
+        stdout=FNULL,
+        stderr=subprocess.STDOUT)
 
 input_path = 'input/20200324_yogawithadrienne.html'
 output_path = '/Users/harmtemolder/STACK/Videos/Yoga with Adrienne'

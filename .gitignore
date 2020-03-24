@@ -1,6 +1,9 @@
 # Input folder contents
 input/*
 
+# FFmpeg
+ffmpeg
+
 # Mac
 .DS_Store
 

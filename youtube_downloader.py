@@ -20,6 +20,7 @@ import subprocess
 from bs4 import BeautifulSoup
 from pytube import YouTube
 from pytube.exceptions import RegexMatchError
+from ssl import SSLError
 
 
 def get_links_from_file(html_file):
@@ -169,6 +170,10 @@ for video_title, video_url in new_videos.items():
             video_url,
             output_path)
     except RegexMatchError as e:
+        print('{}, skipping video...'.format(e))
+    except ConnectionResetError as e:
+        print('{}, skipping video...'.format(e))
+    except SSLError as e:
         print('{}, skipping video...'.format(e))
 
 # In Mac OSX 10.6 and higher, reveal the output directory in Finder

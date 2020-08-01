@@ -4,7 +4,7 @@ A simple command-line youtube downloader using `pytube`
 """
 import os
 from pathlib import Path
-from pytube import YouTube
+from pytube import YouTube  # https://pypi.org/project/pytubeX/
 import sys
 from urllib.parse import urlparse
 

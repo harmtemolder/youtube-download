@@ -1,25 +1,21 @@
-#!/Users/harmtemolder/GitHub/youtube-download/env/bin/python
+#!/usr/bin/env python3
+
+"""A simple command-line youtube downloader using `pytube`
 """
-A simple command-line youtube downloader using `pytube`
-"""
+
 import os
 from pathlib import Path
 from pytube import YouTube  # https://pypi.org/project/pytubeX/
 import sys
-from urllib.parse import urlparse
+from urllib.parse import urlparse, parse_qsl
 
 
 class YouTubeDownloader:
     def __init__(self, video_url):
         parsed_url = urlparse(video_url)
-        if parsed_url.netloc == 'www.youtube.com':
-            self.video_url = parsed_url.geturl()
-        elif parsed_url.netloc == 'invidio.us':
-            self.video_url = '{}://www.youtube.com{}?{}'.format(
-                parsed_url.scheme,
-                parsed_url.path,
-                parsed_url.query
-            )
+        parsed_qs = dict(parse_qsl(parsed_url.query))
+        if 'v' in parsed_qs.keys():
+            self.video_url = 'https://www.youtube.com?v={}'.format(parsed_qs['v'])
         else:
             raise ValueError('Unrecognized video_url')
 
